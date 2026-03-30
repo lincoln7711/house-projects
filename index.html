@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>House Projects</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --accent: #e8632a;
+    --accent2: #f0a500;
+    --text: #f0ece4;
+    --muted: #6b6b6b;
+    --success: #4caf76;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 20px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  header p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  .accent-bar {
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    margin-top: 14px;
+    border-radius: 2px;
+  }
+
+  form {
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  label span.req {
+    color: var(--accent);
+    margin-left: 2px;
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    padding: 14px 16px;
+    width: 100%;
+    transition: border-color 0.15s, background 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input[type="text"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--surface2);
+  }
+
+  textarea {
+    resize: none;
+    height: 90px;
+    line-height: 1.5;
+  }
+
+  .select-wrap {
+    position: relative;
+  }
+
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+    font-size: 0.85rem;
+  }
+
+  select option {
+    background: #1a1a1a;
+  }
+
+  .pill-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill-group input[type="radio"] {
+    display: none;
+  }
+
+  .pill-group label {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    padding: 8px 16px;
+    text-transform: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .pill-group input[type="radio"]:checked + label {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+  }
+
+  button[type="submit"] {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.1em;
+    padding: 18px;
+    width: 100%;
+    transition: opacity 0.15s, transform 0.1s;
+    margin-top: 4px;
+  }
+
+  button[type="submit"]:active {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+
+  button[type="submit"]:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  #toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--success);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 14px 28px;
+    border-radius: 100px;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 100;
+  }
+
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { background: #c0392b; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>House Projects</h1>
+  <p>New task intake</p>
+  <div class="accent-bar"></div>
+</header>
+
+<form id="projectForm">
+
+  <div class="field">
+    <label>Description <span class="req">*</span></label>
+    <input type="text" id="description" placeholder="What needs doing?" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label>Room <span class="req">*</span></label>
+    <div class="select-wrap">
+      <select id="room">
+        <option value="">Select a room…</option>
+        <option>Parlor</option>
+        <option>Media Room</option>
+        <option>Living Room</option>
+        <option>Dining Room</option>
+        <option>Kitchen</option>
+        <option>Garage</option>
+        <option>Bathroom</option>
+        <option>Bedroom</option>
+        <option>Basement</option>
+        <option>Exterior</option>
+        <option>Other</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="field">
+    <label>Type of Work</label>
+    <div class="pill-group">
+      <input type="radio" name="typeOfWork" id="tw-todo" value="To-Do">
+      <label for="tw-todo">To-Do</label>
+      <input type="radio" name="typeOfWork" id="tw-task" value="Task" checked>
+      <label for="tw-task">Task</label>
+      <input type="radio" name="typeOfWork" id="tw-project" value="Project">
+      <label for="tw-project">Project</label>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Category</label>
+    <div class="pill-group">
+      <input type="radio" name="category" id="cat-maint" value="Maintenance/Repair">
+      <label for="cat-maint">Maintenance / Repair</label>
+      <input type="radio" name="category" id="cat-upgrade" value="Upgrade" checked>
+      <label for="cat-upgrade">Upgrade</label>
+      <input type="radio" name="category" id="cat-reno" value="Renovation/Addition">
+      <label for="cat-reno">Renovation / Addition</label>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="field">
+    <label>Time Needed</label>
+    <div class="pill-group">
+      <input type="radio" name="timeNeeded" id="t-1" value="1-2 hours" checked>
+      <label for="t-1">1–2 hrs</label>
+      <input type="radio" name="timeNeeded" id="t-half" value="half day">
+      <label for="t-half">Half day</label>
+      <input type="radio" name="timeNeeded" id="t-full" value="full day">
+      <label for="t-full">Full day</label>
+      <input type="radio" name="timeNeeded" id="t-week" value="Weekend">
+      <label for="t-week">Weekend</label>
+      <input type="radio" name="timeNeeded" id="t-multi" value="multi-day">
+      <label for="t-multi">Multi-day</label>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Supplies?</label>
+    <div class="pill-group">
+      <input type="radio" name="supplies" id="s-none" value="None" checked>
+      <label for="s-none">None</label>
+      <input type="radio" name="supplies" id="s-some" value="Some">
+      <label for="s-some">Some</label>
+      <input type="radio" name="supplies" id="s-most" value="Most">
+      <label for="s-most">Most</label>
+      <input type="radio" name="supplies" id="s-all" value="All">
+      <label for="s-all">All</label>
+    </div>
+  </div>
+
+  <button type="submit" id="submitBtn">Add to Notion</button>
+
+</form>
+
+<div id="toast"></div>
+
+<script>
+  function getRadioValue(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : null;
+  }
+
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show' + (isError ? ' error' : '');
+    setTimeout(() => { t.className = ''; }, 3000);
+  }
+
+  document.getElementById('projectForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const description = document.getElementById('description').value.trim();
+    const room        = document.getElementById('room').value;
+
+    if (!description) { showToast('Add a description first', true); return; }
+    if (!room)        { showToast('Pick a room', true); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    const properties = {
+      "Description": {
+        "title": [{ "text": { "content": description } }]
+      },
+      "Room": {
+        "select": { "name": room }
+      },
+      "Type of Work": {
+        "select": { "name": getRadioValue('typeOfWork') }
+      },
+      "Category": {
+        "select": { "name": getRadioValue('category') }
+      },
+      "Time Needed": {
+        "select": { "name": getRadioValue('timeNeeded') }
+      },
+      "Supplies?": {
+        "select": { "name": getRadioValue('supplies') }
+      },
+      "Status": {
+        "select": { "name": "Not Started" }
+      }
+    };
+
+    try {
+      const res = await fetch('/api/notion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ properties })
+      });
+
+      if (res.ok) {
+        showToast('✓ Added to Notion');
+        document.getElementById('description').value = '';
+        document.getElementById('room').value = '';
+        document.querySelector('input[name="typeOfWork"][value="Task"]').checked = true;
+        document.querySelector('input[name="category"][value="Upgrade"]').checked = true;
+        document.querySelector('input[name="timeNeeded"][value="1-2 hours"]').checked = true;
+        document.querySelector('input[name="supplies"][value="None"]').checked = true;
+        document.getElementById('description').focus();
+      } else {
+        const err = await res.json();
+        console.error(err);
+        showToast('Notion error — check console', true);
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error', true);
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Add to Notion';
+  });
+</script>
+</body>
+</html>
