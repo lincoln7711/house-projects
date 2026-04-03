@@ -31,7 +31,7 @@ export default async function(req, context) {
       headers: {
         'Authorization': `Bearer ${NOTION_TOKEN}`,
         'Content-Type': 'application/json',
-        'Notion-Version': '2025-09-03'
+        'Notion-Version': '2025-03-27'
       },
       body: JSON.stringify({
         parent: { database_id: DATABASE_ID },
