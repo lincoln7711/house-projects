@@ -25,10 +25,7 @@ export default async function(req, context) {
         filter: {
           property: 'Current Work?',
           checkbox: { equals: true }
-        },
-        sorts: [
-          { property: 'Priority (displayed)', direction: 'ascending' }
-        ]
+        }
       })
     });
   } catch (err) {
