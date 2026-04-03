@@ -1,6 +1,6 @@
 export default async function(req, context) {
   const NOTION_TOKEN = process.env.NOTION_TOKEN;
-  const DATABASE_ID  = '3342f5621e20804a92a7d15c70038350';
+  const DATABASE_ID  = '2082f5621e2080bf8f9dc7e28a299481';
   
   const url = `https://api.notion.com/v1/databases/${DATABASE_ID}/query`;
 
