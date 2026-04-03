@@ -2,7 +2,6 @@ export default async function(req, context) {
   const NOTION_TOKEN = process.env.NOTION_TOKEN;
   const DATABASE_ID  = '3342f562-1e20-804a-92a7-d15c70038350';
 
-  // Fetch all pages via search, then filter for Current Work? in JS
   let results = [];
   let cursor = undefined;
 
@@ -28,11 +27,13 @@ export default async function(req, context) {
       });
     }
 
-    // Filter to pages in our database with Current Work? checked
     const filtered = (data.results || []).filter(page => {
       const parentDbId = page.parent?.database_id?.replace(/-/g, '') || '';
+      const dataSourceDbId = page.parent?.data_source_id ? '' : '';
       const ourDbId = DATABASE_ID.replace(/-/g, '');
-      const isOurDb = parentDbId === ourDbId || page.parent?.data_source_id?.replace(/-/g, '') === ourDbId;
+      const isOurDb = parentDbId === ourDbId || 
+                      (page.parent?.database_id === DATABASE_ID) ||
+                      page.parent?.data_source_id;
       const currentWork = page.properties?.['Current Work?']?.checkbox === true;
       return isOurDb && currentWork;
     });
@@ -40,6 +41,13 @@ export default async function(req, context) {
     results = results.concat(filtered);
     cursor = data.has_more ? data.next_cursor : undefined;
   } while (cursor);
+
+  // Sort by Priority (displayed) ascending
+  results.sort((a, b) => {
+    const pa = a.properties?.['Priority (displayed)']?.formula?.string || 'P4';
+    const pb = b.properties?.['Priority (displayed)']?.formula?.string || 'P4';
+    return pa.localeCompare(pb);
+  });
 
   return new Response(JSON.stringify({ results }), {
     status: 200,
