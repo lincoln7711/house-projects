@@ -8,14 +8,14 @@
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap');
 
   :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #242424;
-    --border: #2e2e2e;
-    --accent: #e8632a;
-    --accent2: #f0a500;
-    --text: #f0ece4;
-    --muted: #6b6b6b;
+    --bg: #293241;
+    --surface: #3D5B81;
+    --surface2: #2d3f55;
+    --border: #4a6d8c;
+    --accent: #EE6B4D;
+    --accent2: #9BC0D9;
+    --text: #DFFBFC;
+    --muted: #9BC0D9;
     --success: #4caf76;
     --radius: 10px;
   }
@@ -136,8 +136,8 @@
     font-size: 0.85rem;
   }
 
-  select option {
-    background: #1a1a1a;
+  select option { color: #DFFBFC;
+    background: #3D5B81;
   }
 
   .pill-group {
@@ -236,7 +236,12 @@
 
   <div class="field">
     <label>Description <span class="req">*</span></label>
-    <input type="text" id="description" placeholder="What needs doing?" autocomplete="off" />
+    <input type="text" id="description" placeholder="Short title — what needs doing?" autocomplete="off" />
+  </div>
+
+  <div class="field">
+    <label>Details</label>
+    <textarea id="details" placeholder="Any extra context, measurements, links, notes…"></textarea>
   </div>
 
   <div class="field">
@@ -377,7 +382,7 @@
       const res = await fetch('/.netlify/functions/notion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ properties })
+        body: JSON.stringify({ properties, details: document.getElementById('details').value.trim() })
       });
 
       if (res.ok) {
@@ -388,6 +393,7 @@
         document.querySelector('input[name="category"][value="Upgrade"]').checked = true;
         document.querySelector('input[name="timeNeeded"][value="1-2 hours"]').checked = true;
         document.querySelector('input[name="supplies"][value="None"]').checked = true;
+        document.getElementById('details').value = '';
         document.getElementById('description').focus();
       } else {
         const err = await res.json();

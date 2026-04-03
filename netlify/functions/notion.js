@@ -22,7 +22,29 @@ export default async function(req, context) {
     });
   }
 
-  const { properties } = body;
+  const { properties, details } = body;
+
+  const payload = {
+    parent: { database_id: DATABASE_ID },
+    properties
+  };
+
+  if (details && details.trim()) {
+    payload.children = [
+      {
+        object: 'block',
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [
+            {
+              type: 'text',
+              text: { content: details.trim() }
+            }
+          ]
+        }
+      }
+    ];
+  }
 
   let notionRes;
   try {
@@ -33,10 +55,7 @@ export default async function(req, context) {
         'Content-Type': 'application/json',
         'Notion-Version': '2026-03-11'
       },
-      body: JSON.stringify({
-        parent: { database_id: DATABASE_ID },
-        properties
-      })
+      body: JSON.stringify(payload)
     });
   } catch (err) {
     return new Response(JSON.stringify({ error: 'Failed to reach Notion API', detail: err.message }), {
@@ -47,7 +66,14 @@ export default async function(req, context) {
 
   const text = await notionRes.text();
 
-  return new Response(text, {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = { error: 'Unparseable Notion response', raw: text, status: notionRes.status };
+  }
+
+  return new Response(JSON.stringify(data), {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -59,4 +85,3 @@ export default async function(req, context) {
 export const config = {
   path: "/.netlify/functions/notion"
 };
-// cache bust Fri Apr  3 11:14:05 AM EDT 2026
