@@ -28,21 +28,18 @@ export default async function(req, context) {
     }
 
     const filtered = (data.results || []).filter(page => {
-      const parentDbId = page.parent?.database_id?.replace(/-/g, '') || '';
-      const dataSourceDbId = page.parent?.data_source_id ? '' : '';
-      const ourDbId = DATABASE_ID.replace(/-/g, '');
-      const isOurDb = parentDbId === ourDbId || 
-                      (page.parent?.database_id === DATABASE_ID) ||
-                      page.parent?.data_source_id;
+      const isOurDb = page.parent?.data_source_id != null ||
+                      page.parent?.database_id === DATABASE_ID;
       const currentWork = page.properties?.['Current Work?']?.checkbox === true;
-      return isOurDb && currentWork;
+      const status = page.properties?.['Status']?.select?.name || '';
+      const notCompleted = status !== 'Completed';
+      return isOurDb && currentWork && notCompleted;
     });
 
     results = results.concat(filtered);
     cursor = data.has_more ? data.next_cursor : undefined;
   } while (cursor);
 
-  // Sort by Priority (displayed) ascending
   results.sort((a, b) => {
     const pa = a.properties?.['Priority (displayed)']?.formula?.string || 'P4';
     const pb = b.properties?.['Priority (displayed)']?.formula?.string || 'P4';
