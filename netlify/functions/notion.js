@@ -1,14 +1,24 @@
-export async function onRequestPost(context) {
-  const NOTION_TOKEN = context.env.NOTION_TOKEN;
-  const DATABASE_ID  = context.env.DATABASE_ID;
+export default async function(req, context) {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
+    });
+  }
+
+  const NOTION_TOKEN = process.env.NOTION_TOKEN;
+  const DATABASE_ID  = process.env.DATABASE_ID;
 
   let body;
   try {
-    body = await context.request.json();
+    body = await req.json();
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' }
     });
   }
 
@@ -31,20 +41,13 @@ export async function onRequestPost(context) {
   } catch (err) {
     return new Response(JSON.stringify({ error: 'Failed to reach Notion API', detail: err.message }), {
       status: 502,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' }
     });
   }
 
   const text = await notionRes.text();
 
-  let data;
-  try {
-    data = JSON.parse(text);
-  } catch {
-    data = { error: 'Unparseable Notion response', raw: text, status: notionRes.status };
-  }
-
-  return new Response(JSON.stringify(data), {
+  return new Response(text, {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
@@ -53,12 +56,6 @@ export async function onRequestPost(context) {
   });
 }
 
-export async function onRequestOptions() {
-  return new Response(null, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    }
-  });
-}
+export const config = {
+  path: "/.netlify/functions/notion"
+};
