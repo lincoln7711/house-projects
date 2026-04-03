@@ -1,25 +1,47 @@
 export default async function(req, context) {
   const NOTION_TOKEN = process.env.NOTION_TOKEN;
-  const DATABASE_ID  = '3342f5621e20810d8bbe000bb5caa0ee';
+  const DATABASE_ID  = '3342f562-1e20-804a-92a7-d15c70038350';
 
-  const notionRes = await fetch(`https://api.notion.com/v1/databases/${DATABASE_ID}/query`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${NOTION_TOKEN}`,
-      'Content-Type': 'application/json',
-      'Notion-Version': '2026-03-11'
-    },
-    body: JSON.stringify({
-      filter: {
-        property: 'Current Work?',
-        checkbox: { equals: true }
-      }
-    })
-  });
+  // Fetch all pages via search, then filter for Current Work? in JS
+  let results = [];
+  let cursor = undefined;
 
-  const text = await notionRes.text();
+  do {
+    const body = { filter: { property: 'object', value: 'page' }, page_size: 100 };
+    if (cursor) body.start_cursor = cursor;
 
-  return new Response(JSON.stringify({ status: notionRes.status, body: text.substring(0, 1000) }), {
+    const res = await fetch('https://api.notion.com/v1/search', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${NOTION_TOKEN}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2026-03-11'
+      },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+    if (data.error) {
+      return new Response(JSON.stringify(data), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+
+    // Filter to pages in our database with Current Work? checked
+    const filtered = (data.results || []).filter(page => {
+      const parentDbId = page.parent?.database_id?.replace(/-/g, '') || '';
+      const ourDbId = DATABASE_ID.replace(/-/g, '');
+      const isOurDb = parentDbId === ourDbId || page.parent?.data_source_id?.replace(/-/g, '') === ourDbId;
+      const currentWork = page.properties?.['Current Work?']?.checkbox === true;
+      return isOurDb && currentWork;
+    });
+
+    results = results.concat(filtered);
+    cursor = data.has_more ? data.next_cursor : undefined;
+  } while (cursor);
+
+  return new Response(JSON.stringify({ results }), {
     status: 200,
     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
   });
