@@ -322,6 +322,11 @@
     </div>
   </div>
 
+  <div class="field" style="flex-direction:row;align-items:center;gap:12px;">
+    <input type="checkbox" id="currentWork" style="width:20px;height:20px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;">
+    <label for="currentWork" style="text-transform:none;font-size:0.9rem;color:var(--text);letter-spacing:0;cursor:pointer;">Add to Current Work list</label>
+  </div>
+
   <button type="submit" id="submitBtn">Add to Notion</button>
 
 </form>
@@ -373,6 +378,9 @@
       "Supplies?": {
         "select": { "name": getRadioValue('supplies') }
       },
+      "Current Work?": {
+        "checkbox": document.getElementById('currentWork').checked
+      },
       "Status": {
         "select": { "name": "Not Started" }
       }
@@ -394,6 +402,7 @@
         document.querySelector('input[name="timeNeeded"][value="1-2 hours"]').checked = true;
         document.querySelector('input[name="supplies"][value="None"]').checked = true;
         document.getElementById('details').value = '';
+        document.getElementById('currentWork').checked = false;
         document.getElementById('description').focus();
       } else {
         const err = await res.json();
