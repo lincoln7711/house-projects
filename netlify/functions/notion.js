@@ -84,7 +84,7 @@ export default async function(req, context) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'House Projects <onboarding@resend.dev>',
+        from: 'House Projects <noreply@thesmiths88.com>',
         to: 'houseprojects@andrewlincolnsmith.com',
         subject: `New task: ${title}`,
         html: `
